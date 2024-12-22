@@ -31,6 +31,19 @@ class MyAppState extends ChangeNotifier {
     current = WordPair.random();
     notifyListeners();
   }
+
+  //Functionality for adding words to favorites
+  var favorites = <WordPair>[];
+
+  void toggleFavorite() {
+    if (favorites.contains(current)) {
+      favorites.remove(current);
+    } else {
+      favorites.add(current);
+    }
+    print(favorites);
+    notifyListeners();
+  }
 }
 
 class MyHomePage extends StatelessWidget {
@@ -39,20 +52,41 @@ class MyHomePage extends StatelessWidget {
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
 
+    IconData icon;
+    if (appState.favorites.contains(pair)) {
+      icon = Icons.favorite; //heart icon
+    } else {
+      icon = Icons.favorite_border;
+    }
+
     return Scaffold(
       body: Center(
         child: Column(
-          
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             BigCard(pair: pair),
-            SizedBox(height: 40,),
-            ElevatedButton(
-              onPressed: () {
-                // On pressing the button a method of the MyAppState class is called
-                appState.getNext();
-              },
-              child: Text('Next'),
+            SizedBox(
+              height: 40,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                    onPressed: () {
+                      //On pressing the button it has to add the wordpair to favorites
+                      appState.toggleFavorite();
+                    },
+                    icon: Icon(icon), //Using the icon from above icondata
+                    label: Text('Like')),
+                ElevatedButton(
+                  onPressed: () {
+                    // On pressing the button a method of the MyAppState class is called
+                    //Gets the next word pair
+                    appState.getNext();
+                  },
+                  child: Text('Next'),
+                ),
+              ],
             ),
           ],
         ),
